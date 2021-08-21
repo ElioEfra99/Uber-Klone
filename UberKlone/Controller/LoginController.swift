@@ -73,7 +73,7 @@ class LoginController: UIViewController {
         
         button.setAttributedTitle(attributedTitle, for: .normal)
         
-        // button.addAction(#selector(), for: <#T##UIControl.Event#>)
+        button.addTarget(self, action: #selector(handleShowSignUp), for: .touchUpInside)
         
         return button
     }()
@@ -82,31 +82,49 @@ class LoginController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupUI()
+        
+    }
+    
+    //MARK: - Selectors
+    
+    @objc func handleShowSignUp() {
+        let controller = SignUpController()
+        navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    //MARK: - Helper Functions
+    
+    func setupUI() {
+        setupNavigationBar()
+        
         let safeArea = view.safeAreaLayoutGuide
-        
-        view.backgroundColor = .backgroundColor
-        
-        view.addSubview(titleLabel)
-        titleLabel.anchor(top: view.safeAreaLayoutGuide.topAnchor)
-        titleLabel.centerX(inView: view)
-        
         let stack = UIStackView(arrangedSubviews: [emailContainerView, passwordContainerView, loginButton])
         stack.axis = .vertical
         stack.distribution = .fillEqually
         stack.spacing = 24
         
+        view.addSubview(titleLabel)
+        view.addSubview(dontHaveAccountButton)
         view.addSubview(stack)
+        
         stack.anchor(top: titleLabel.bottomAnchor, left: safeArea.leftAnchor, right: safeArea.rightAnchor,
                      paddingTop: 40, paddingLeft: 16, paddingRight: 16)
         
-        view.addSubview(dontHaveAccountButton)
+        titleLabel.anchor(top: view.safeAreaLayoutGuide.topAnchor)
+        titleLabel.centerX(inView: view)
+        
         dontHaveAccountButton.anchor(bottom: safeArea.bottomAnchor, height: 32)
         dontHaveAccountButton.centerX(inView: view)
         
+        
+        view.backgroundColor = .backgroundColor
+        
     }
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        .lightContent
+    func setupNavigationBar(){
+        navigationController?.navigationBar.isHidden = true
+        navigationController?.navigationBar.barStyle = .black
     }
     
     
