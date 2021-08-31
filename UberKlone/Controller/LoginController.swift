@@ -40,14 +40,10 @@ class LoginController: UIViewController {
         UITextField().textField(withPlaceholder: "Password", isSecureTextEntry: true)
     }()
     
-    private let loginButton: UIButton = {
-        let button = UIButton(type: .system)
+    private let loginButton: AuthButton = {
+        let button = AuthButton(type: .system)
         button.setTitle("Login", for: .normal)
-        button.setTitleColor(UIColor(white: 1, alpha: 0.5), for: .normal)
-        button.backgroundColor = .mainBlueTint
-        button.layer.cornerRadius = 5
-        button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 18)
-        button.heightAnchor.constraint(equalToConstant: 50).isActive = true
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 18)
         return button
     }()
     
@@ -108,14 +104,14 @@ class LoginController: UIViewController {
         view.addSubview(dontHaveAccountButton)
         view.addSubview(stack)
         
-        stack.anchor(top: titleLabel.bottomAnchor, left: safeArea.leftAnchor, right: safeArea.rightAnchor,
-                     paddingTop: 40, paddingLeft: 16, paddingRight: 16)
-        
-        titleLabel.anchor(top: view.safeAreaLayoutGuide.topAnchor)
+        titleLabel.anchor(top: safeArea.topAnchor)
         titleLabel.centerX(inView: view)
         
         dontHaveAccountButton.anchor(bottom: safeArea.bottomAnchor, height: 32)
         dontHaveAccountButton.centerX(inView: view)
+        
+        stack.anchor(top: titleLabel.bottomAnchor, left: safeArea.leftAnchor, right: safeArea.rightAnchor,
+                     paddingTop: 40, paddingLeft: 16, paddingRight: 16)
         
         
         view.backgroundColor = .backgroundColor
