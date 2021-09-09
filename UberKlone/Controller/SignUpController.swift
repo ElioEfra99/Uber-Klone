@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Amplify
 
 class SignUpController: UIViewController {
     
@@ -44,7 +45,9 @@ class SignUpController: UIViewController {
     }()
     
     private let emailTextField: UITextField = {
-        UITextField().textField(withPlaceholder: "Email", isSecureTextEntry: false)
+        let textField = UITextField().textField(withPlaceholder: "Email", isSecureTextEntry: false)
+        textField.autocapitalizationType = .none
+        return textField
     }()
     
     
@@ -55,7 +58,7 @@ class SignUpController: UIViewController {
     
     
     private let passwordTextField: UITextField = {
-        UITextField().textField(withPlaceholder: "Password", isSecureTextEntry: false)
+        UITextField().textField(withPlaceholder: "Password", isSecureTextEntry: true)
     }()
     
     private let accountTypeSegmentedControl: UISegmentedControl = {
@@ -70,7 +73,7 @@ class SignUpController: UIViewController {
     private let signupButton: UIButton = {
         let button = AuthButton(type: .system)
         button.setTitle("Sign Up", for: .normal)
-        
+        button.addTarget(self, action: #selector(handleSignUp), for: .touchUpInside)
         return button
     }()
     
@@ -96,7 +99,6 @@ class SignUpController: UIViewController {
         )
         
         button.setAttributedTitle(attributedTitle, for: .normal)
-        
         button.addTarget(self, action: #selector(handleShowLogin), for: .touchUpInside)
         
         return button
@@ -118,6 +120,37 @@ class SignUpController: UIViewController {
     @objc func handleShowLogin() {
         navigationController?.popViewController(animated: true)
     }
+    
+    @objc func handleSignUp() {
+        guard let email = emailTextField.text else { return }
+        guard let password = passwordTextField.text else { return }
+        guard let fullName = fullNameTextField.text else { return }
+        let accountType = accountTypeSegmentedControl.selectedSegmentIndex
+        
+        AuthService.shared.signUp(username: email, password: password, email: email)
+        
+        let user = User(
+            accountType: accountType,
+            email: email,
+            fullName: fullName
+        )
+
+        Amplify.API.mutate(request: .create(user)) { event in
+            switch event {
+            case .success(let result):
+                switch result {
+                case .success(let user):
+                    print("Successfully created the user: \(user)")
+                case .failure(let graphQLError):
+                    print("Failed to create graphql \(graphQLError)")
+                }
+            case .failure(let apiError):
+                print("Failed to create a user", apiError)
+            }
+        }
+    }
+        
+        
     
     //MARK: - Helper Functions
     

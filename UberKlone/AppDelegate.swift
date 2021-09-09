@@ -6,14 +6,14 @@
 //
 
 import UIKit
+import Amplify
+import AmplifyPlugins
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        configureAmplify()
         return true
     }
 
@@ -30,7 +30,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
+    
+    //MARK: - Amplify Configuration
 
+    private func configureAmplify() {
+        do {
+            Amplify.Logging.logLevel = .verbose
+            try Amplify.add(plugin: AWSCognitoAuthPlugin())
+            try Amplify.add(plugin: AWSAPIPlugin(modelRegistration: AmplifyModels()))
+            try Amplify.configure()
+            print("DEBUG: Amplify configured with auth and api plugins")
+        } catch {
+            print("DEBUG: Failed to initialize Amplify with \(error)")
+        }
+    }
 
 }
 

@@ -1,0 +1,6 @@
+type User @model {
+  id: ID!
+  accountType: Int!
+  email: AWSEmail!
+  fullName: String!
+}
