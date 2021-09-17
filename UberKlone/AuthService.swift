@@ -24,10 +24,10 @@ class AuthService {
                     print("DEBUG: Delivery details \(String(describing: deliveryDetails))")
                 } else {
                     print("DEBUG: SignUp Complete")
-                    self.fetchCurrentAuthSession()
                 }
             case .failure(let error):
                 print("DEBUG: An error occurred while registering a user \(error)")
+                return
             }
         }
     }
@@ -38,7 +38,6 @@ class AuthService {
             switch result {
             case .success:
                 print("DEBUG: Sign in succeeded")
-                self.fetchCurrentAuthSession()
             case .failure(let error):
                 print("DEBUG: Sign in failed \(error)")
                 
@@ -52,16 +51,29 @@ class AuthService {
             switch result {
             case .success:
                 print("DEBUG: Successfully signed out")
-                self.fetchCurrentAuthSession()
             case .failure(let error):
                 print("DEBUG: Sign out failed with error \(error)")
             }
         }
     }
     
+    //MARK: - Attributes
+    
+    func fetchAttributes() {
+        Amplify.Auth.fetchUserAttributes() { result in
+            switch result {
+            case .success(let attributes):
+                print("User attributes - \(attributes)")
+                print(attributes[1].value)
+            case .failure(let error):
+                print("Fetching user attributes failed with error \(error)")
+            }
+        }
+    }
+    
     //MARK: - Session
     
-    @objc func fetchCurrentAuthSession() {
+    func fetchCurrentAuthSession() {
         Amplify.Auth.fetchAuthSession { result in
             switch result {
             case .success(let session):

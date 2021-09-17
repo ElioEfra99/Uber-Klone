@@ -7,16 +7,17 @@
 
 import UIKit
 import Amplify
+import MapKit
 
 class HomeController: UIViewController {
     //MARK: - Properties
+    private let mapView = MKMapView()
     
     //MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        view.backgroundColor = .red
+        //AuthService.shared.signOutLocally()
         checkIfUserIsLoggedIn()
     }
     
@@ -26,9 +27,7 @@ class HomeController: UIViewController {
         Amplify.Auth.fetchAuthSession() { result in
             switch result {
             case .success(let session):
-                if session.isSignedIn {
-                    print("DEBUG: User is Signed In")
-                } else {
+                if !(session.isSignedIn) {
                     DispatchQueue.main.async {
                         let nav = UINavigationController(rootViewController: LoginController())
                         if #available(iOS 13.0, *) {
@@ -37,10 +36,21 @@ class HomeController: UIViewController {
                         nav.modalPresentationStyle = .fullScreen
                         self.present(nav, animated: true, completion: nil)
                     }
+                } else {
+                    DispatchQueue.main.async {
+                        self.configureUI()
+                    }
                 }
             case .failure(let error):
                 print("DEBUG: Fetch session failed with error \(error)")
             }
         }
     }
+    
+    //MARK: - Helper
+    func configureUI() {
+        view.addSubview(mapView)
+        mapView.frame = view.frame
+    }
+    
 }

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Amplify
 
 class LoginController: UIViewController {
     
@@ -82,8 +83,6 @@ class LoginController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
-        AuthService.shared.fetchCurrentAuthSession()
-        
     }
     
     //MARK: - Selectors
@@ -97,7 +96,21 @@ class LoginController: UIViewController {
         guard let email = emailTextField.text else { return }
         guard let password = passwordTextField.text else { return }
         
-        AuthService.shared.signIn(username: email, password: password)
+        Amplify.Auth.signIn(username: email, password: password) { result in
+            switch result {
+            case .success:
+                
+                DispatchQueue.main.async {
+                    guard let controller = UIApplication.shared.keyWindow?.rootViewController as? HomeController else { return }
+                    
+                    controller.configureUI()
+                    self.dismiss(animated: true, completion: nil)
+                }
+                
+            case .failure(let error):
+                print("DEBUG: SignIn Failed with error: \(error)")
+            }
+        }
         
     }
     

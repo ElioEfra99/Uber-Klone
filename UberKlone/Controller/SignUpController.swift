@@ -104,10 +104,6 @@ class SignUpController: UIViewController {
         return button
     }()
     
-    
-    
-    
-    
     //MARK: - Lifecycle
     
     override func viewDidLoad() {
@@ -127,29 +123,35 @@ class SignUpController: UIViewController {
         guard let fullName = fullNameTextField.text else { return }
         let accountType = accountTypeSegmentedControl.selectedSegmentIndex
         
-        AuthService.shared.signUp(username: email, password: password, email: email)
+        let userAttributes = [AuthUserAttribute(.email, value: email)]
+        let options = AuthSignUpRequest.Options(userAttributes: userAttributes)
         
-        let user = User(
-            accountType: accountType,
-            email: email,
-            fullName: fullName
-        )
-
-        Amplify.API.mutate(request: .create(user)) { event in
-            switch event {
-            case .success(let result):
-                switch result {
-                case .success(let user):
-                    print("Successfully created the user: \(user)")
-                case .failure(let graphQLError):
-                    print("Failed to create graphql \(graphQLError)")
+        Amplify.Auth.signUp(username: email, password: password, options: options) { result in
+            
+            switch result {
+            case .success:
+                print("DEBUG: User was registered")
+                
+                Amplify.Auth.signIn(username: email, password: password) { result in
+                    
+                    switch result {
+                    case .success:
+                        print("DEBUG: Sign in succeeded")
+                        self.fetchNewUserAttributesWith(accountType: accountType, fullName: fullName, email: email)
+                        
+                    case .failure(let error):
+                        print("DEBUG: Sign in failed \(error)")
+                        
+                    }
                 }
-            case .failure(let apiError):
-                print("Failed to create a user", apiError)
+                
+            case .failure(let error):
+                print("DEBUG: An error occurred while registering a user \(error)")
+                return
             }
+            
         }
     }
-        
         
     
     //MARK: - Helper Functions
@@ -185,7 +187,51 @@ class SignUpController: UIViewController {
         alreadyHaveAccountButton.centerX(inView: view)
     }
     
-    func setupNavigationBar() {
-        
+    func createUser(_ user: User) {
+        Amplify.API.mutate(request: .create(user)) { event in
+            switch event {
+            case .success(let result):
+                
+                switch result {
+                case .success(let user):
+                    print("DEBUG: Successfully created the user: \(user)")
+                    DispatchQueue.main.async {
+                        guard let controller = UIApplication.shared.keyWindow?.rootViewController as? HomeController else { return }
+                        controller.configureUI()
+                        self.dismiss(animated: true, completion: nil)
+                    }
+                case .failure(let graphQLError):
+                    // Probably delete recently created user, as creating a table with its data was not possible
+                    print("DEBUG: Failed to create graphql \(graphQLError)")
+                }
+            case .failure(let apiError):
+                print("DEBUG: Failed to create a user", apiError)
+            }
+        }
+    }
+    
+    func fetchNewUserAttributesWith(accountType: Int, fullName: String, email: String) {
+        Amplify.Auth.fetchUserAttributes() { result in
+            switch result {
+            case .success(let attributes):
+                print("DEBUG: User attributes - \(attributes)")
+                
+                let id = attributes.first { attribute in
+                    attribute.key == AuthUserAttributeKey.unknown("sub")
+                }
+                
+                let user = User(
+                    id: id!.value, // At this point, it is guaranteed to have the new user signed up, signed in and retrieve a valid sub
+                    accountType: accountType,
+                    email: email,
+                    fullName: fullName
+                )
+                
+                self.createUser(user)
+                
+            case .failure(let error):
+                print("DEBUG: Fetching user attributes failed with error \(error)")
+            }
+        }
     }
 }
