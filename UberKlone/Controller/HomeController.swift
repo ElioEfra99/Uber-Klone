@@ -51,8 +51,15 @@ class HomeController: UIViewController {
     
     //MARK: - Helper
     func configureUI() {
+        configureMap()
+    }
+    
+    func configureMap() {
         view.addSubview(mapView)
         mapView.frame = view.frame
+        
+        mapView.showsUserLocation = true
+        mapView.userTrackingMode = .follow
     }
     
 }
