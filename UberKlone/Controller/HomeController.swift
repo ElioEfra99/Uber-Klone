@@ -12,6 +12,7 @@ import MapKit
 class HomeController: UIViewController {
     //MARK: - Properties
     private let mapView = MKMapView()
+    private let locationManager = CLLocationManager()
     
     //MARK: - Lifecycle
     
@@ -19,6 +20,7 @@ class HomeController: UIViewController {
         super.viewDidLoad()
         //AuthService.shared.signOutLocally()
         checkIfUserIsLoggedIn()
+        enableLocationServices()
     }
     
     //MARK: - API
@@ -53,4 +55,27 @@ class HomeController: UIViewController {
         mapView.frame = view.frame
     }
     
+}
+
+//MARK: - Location Services
+
+extension HomeController: CLLocationManagerDelegate {
+    func enableLocationServices() {
+        locationManager.delegate = self
+        
+        switch locationManager.authorizationStatus {
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        case .restricted, .denied:
+            break
+        case .authorizedAlways:
+            print("DEBUG: Auth always..")
+        case .authorizedWhenInUse:
+            print("DEBUG: Auth when in use..")
+            locationManager.startUpdatingLocation()
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        @unknown default:
+            break
+        }
+    }
 }
