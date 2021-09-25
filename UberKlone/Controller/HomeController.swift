@@ -14,6 +14,7 @@ class HomeController: UIViewController {
     private let mapView = MKMapView()
     private let locationManager = CLLocationManager()
     private let locationInputActivationView = LocationInputActivationView()
+    private let locationInputView = LocationInputView()
     
     //MARK: - Lifecycle
     
@@ -78,6 +79,20 @@ class HomeController: UIViewController {
         mapView.userTrackingMode = .follow
     }
     
+    func configureLocationInputView() {
+        view.addSubview(locationInputView)
+        locationInputView.anchor(top: view.topAnchor, left: view.leftAnchor, right: view.rightAnchor, height: 200)
+        locationInputView.alpha = 0
+        locationInputView.delegate = self
+        
+        UIView.animate(withDuration: 0.5) {
+            self.locationInputView.alpha = 1
+        } completion: { _ in
+             print("DEBUG: Present table view..")
+        }
+
+    }
+    
 }
 
 //MARK: - Location Services
@@ -106,6 +121,22 @@ extension HomeController: CLLocationManagerDelegate {
 
 extension HomeController: LocationInputActivationViewDelegate {
     func presentLocationInputView() {
-        print("DEBUG: Handle present location view...")
+        locationInputActivationView.alpha = 0
+         configureLocationInputView()
     }
+}
+
+//MARK: - LocationInputView Delegate methods
+
+extension HomeController: LocationInputViewDelegate {
+    func dimsissLocationInputView() {
+        UIView.animate(withDuration: 0.3) {
+            self.locationInputView.alpha = 0
+        } completion: { _ in
+            UIView.animate(withDuration: 0.3) {
+                self.locationInputActivationView.alpha = 1
+            }
+        }
+    }
+    
 }
