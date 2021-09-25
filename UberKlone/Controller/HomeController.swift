@@ -60,6 +60,14 @@ class HomeController: UIViewController {
         locationInputActivationView.centerX(inView: view)
         locationInputActivationView.anchor(top: safeArea.topAnchor, paddingTop: 32)
         locationInputActivationView.setDimensions(width: view.frame.width - 64, height: 50)
+        locationInputActivationView.delegate = self
+        
+        locationInputActivationView.alpha = 0
+        
+        UIView.animate(withDuration: 2) {
+            self.locationInputActivationView.alpha = 1
+        }
+        
     }
     
     func configureMap() {
@@ -86,11 +94,18 @@ extension HomeController: CLLocationManagerDelegate {
         case .authorizedAlways:
             print("DEBUG: Auth always..")
         case .authorizedWhenInUse:
-            print("DEBUG: Auth when in use..")
             locationManager.startUpdatingLocation()
             locationManager.desiredAccuracy = kCLLocationAccuracyBest
         @unknown default:
             break
         }
+    }
+}
+
+//MARK: - LocationInputActivationView Delegate methods
+
+extension HomeController: LocationInputActivationViewDelegate {
+    func presentLocationInputView() {
+        print("DEBUG: Handle present location view...")
     }
 }

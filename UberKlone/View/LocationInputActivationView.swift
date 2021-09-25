@@ -7,8 +7,14 @@
 
 import UIKit
 
+protocol LocationInputActivationViewDelegate {
+    func presentLocationInputView()
+}
+
 class LocationInputActivationView: UIView {
     //MARK: - Properties
+    
+    var delegate: LocationInputActivationViewDelegate?
     
     private let indicatorView: UIView = {
         let view = UIView()
@@ -23,6 +29,7 @@ class LocationInputActivationView: UIView {
         label.textColor = .gray
         return label
     }()
+    
     
     //MARK: - Lifecycle
     
@@ -42,11 +49,19 @@ class LocationInputActivationView: UIView {
         
         addSubview(placeholderText)
         placeholderText.centerY(inView: self, leftAnchor: indicatorView.rightAnchor, paddingLeft: 20)
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(presentLocationInputView))
+        addGestureRecognizer(tap)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    //MARK: - Handlers
+    
+    @objc func presentLocationInputView() {
+        delegate?.presentLocationInputView()
+    }
     
 }
