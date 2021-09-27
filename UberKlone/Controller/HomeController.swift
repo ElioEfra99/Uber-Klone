@@ -122,7 +122,7 @@ extension HomeController: CLLocationManagerDelegate {
 extension HomeController: LocationInputActivationViewDelegate {
     func presentLocationInputView() {
         locationInputActivationView.alpha = 0
-         configureLocationInputView()
+        configureLocationInputView()
     }
 }
 
