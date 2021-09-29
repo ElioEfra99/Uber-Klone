@@ -9,18 +9,22 @@ import UIKit
 import Amplify
 import MapKit
 
+private let reuseIdentifier = "LocationCell"
+
 class HomeController: UIViewController {
     //MARK: - Properties
     private let mapView = MKMapView()
     private let locationManager = CLLocationManager()
     private let locationInputActivationView = LocationInputActivationView()
     private let locationInputView = LocationInputView()
+    private let tableView = UITableView()
+    
+    private final let locationInputViewHeight: CGFloat = 200
     
     //MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //AuthService.shared.signOutLocally()
         checkIfUserIsLoggedIn()
         enableLocationServices()
     }
@@ -69,6 +73,8 @@ class HomeController: UIViewController {
             self.locationInputActivationView.alpha = 1
         }
         
+        configureTableView()
+        
     }
     
     func configureMap() {
@@ -81,7 +87,7 @@ class HomeController: UIViewController {
     
     func configureLocationInputView() {
         view.addSubview(locationInputView)
-        locationInputView.anchor(top: view.topAnchor, left: view.leftAnchor, right: view.rightAnchor, height: 200)
+        locationInputView.anchor(top: view.topAnchor, left: view.leftAnchor, right: view.rightAnchor, height: locationInputViewHeight)
         locationInputView.alpha = 0
         locationInputView.delegate = self
         
@@ -91,6 +97,21 @@ class HomeController: UIViewController {
              print("DEBUG: Present table view..")
         }
 
+    }
+    
+    func configureTableView() {
+        view.addSubview(tableView)
+        
+        tableView.dataSource = self
+        tableView.delegate = self
+        
+        tableView.rowHeight = 60
+        
+        tableView.register(LocationCell.self, forCellReuseIdentifier: reuseIdentifier)
+        
+        let tableViewHeight = view.frame.height - locationInputViewHeight
+        
+        tableView.frame = CGRect(x: 0, y: view.frame.height, width: view.frame.width, height: tableViewHeight)
     }
     
 }
@@ -139,4 +160,18 @@ extension HomeController: LocationInputViewDelegate {
         }
     }
     
+}
+
+//MARK: - Table View methods
+
+extension HomeController: UITableViewDelegate, UITableViewDataSource {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        10
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier, for: indexPath)
+        return cell
+    }
+
 }
