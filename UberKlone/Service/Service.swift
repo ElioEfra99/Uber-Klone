@@ -9,8 +9,8 @@ import UIKit
 import Amplify
 import AmplifyPlugins
 
-class AuthService {
-    static let shared = AuthService()
+class Service {
+    static let shared = Service()
     private init() {}
     
     //MARK: - Register
@@ -57,19 +57,59 @@ class AuthService {
         }
     }
     
-    //MARK: - Attributes
+    //MARK: - Fetching Data
     
     func fetchAttributes() {
         Amplify.Auth.fetchUserAttributes() { result in
             switch result {
             case .success(let attributes):
                 print("User attributes - \(attributes)")
-                print(attributes[1].value)
+                
             case .failure(let error):
                 print("Fetching user attributes failed with error \(error)")
             }
         }
     }
+    
+    func fetchUID(completion: @escaping (String) -> Void) {
+        Amplify.Auth.fetchUserAttributes() { result in
+            switch result {
+            case .success(let attributes):
+                let id = attributes.first { attribute in
+                    attribute.key == AuthUserAttributeKey.unknown("sub")
+                }
+                completion(id!.value)
+            case .failure(let error):
+                print("Fetching user attributes failed with error \(error)")
+                completion("")
+            }
+        }
+    }
+    
+    func fetchUserData() {
+        fetchUID {
+            print($0)
+            Amplify.API.query(request: .get(User.self, byId: $0)) { event in
+                switch event {
+                case .success(let result):
+                    switch result {
+                    case .success(let user):
+                        guard let user = user else {
+                            print("Could not find user")
+                            return
+                        }
+                        print("Successfully retrieved user \(user)")
+                    case .failure(let error):
+                        print("Got failed result with \(error.errorDescription)")
+                    }
+                case .failure(let error):
+                    print("Got failed event with \(error)")
+                }
+            }
+        }
+    }
+    
+
     
     //MARK: - Session
     

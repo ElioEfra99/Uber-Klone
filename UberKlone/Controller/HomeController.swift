@@ -27,6 +27,7 @@ class HomeController: UIViewController {
         super.viewDidLoad()
         checkIfUserIsLoggedIn()
         enableLocationServices()
+        Service.shared.fetchUserData()
     }
     
     //MARK: - API
