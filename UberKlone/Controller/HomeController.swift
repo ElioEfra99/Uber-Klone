@@ -20,6 +20,13 @@ class HomeController: UIViewController {
     private let tableView = UITableView()
     
     private final let locationInputViewHeight: CGFloat = 200
+    private var fullName: String? {
+        didSet {
+            DispatchQueue.main.async {
+                self.locationInputView.titleLabel.text = self.fullName
+            }
+        }
+    }
     
     //MARK: - Lifecycle
     
@@ -27,7 +34,7 @@ class HomeController: UIViewController {
         super.viewDidLoad()
         checkIfUserIsLoggedIn()
         enableLocationServices()
-        Service.shared.fetchUserData()
+        fetchUserData()
     }
     
     //MARK: - API
@@ -53,6 +60,12 @@ class HomeController: UIViewController {
             case .failure(let error):
                 print("DEBUG: Fetch session failed with error \(error)")
             }
+        }
+    }
+    
+    func fetchUserData() {
+        Service.shared.fetchUserData {
+            self.fullName = $0
         }
     }
     
@@ -95,7 +108,6 @@ class HomeController: UIViewController {
         UIView.animate(withDuration: 0.5) {
             self.locationInputView.alpha = 1
         } completion: { _ in
-             print("DEBUG: Present table view..")
             self.presentTableView()
         }
 
