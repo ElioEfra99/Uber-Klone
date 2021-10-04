@@ -20,10 +20,10 @@ class HomeController: UIViewController {
     private let tableView = UITableView()
     
     private final let locationInputViewHeight: CGFloat = 200
-    private var fullName: String? {
+    private var user: User? {
         didSet {
             DispatchQueue.main.async {
-                self.locationInputView.titleLabel.text = self.fullName
+                self.locationInputView.user = self.user
             }
         }
     }
@@ -65,7 +65,7 @@ class HomeController: UIViewController {
     
     func fetchUserData() {
         Service.shared.fetchUserData {
-            self.fullName = $0
+            self.user = $0
         }
     }
     

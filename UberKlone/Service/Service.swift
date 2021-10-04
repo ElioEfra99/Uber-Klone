@@ -86,7 +86,7 @@ class Service {
         }
     }
     
-    func fetchUserData(completion: @escaping (String) -> Void) {
+    func fetchUserData(completion: @escaping (User) -> Void) {
         fetchUID {
             Amplify.API.query(request: .get(User.self, byId: $0)) { event in
                 switch event {
@@ -97,14 +97,12 @@ class Service {
                             print("Could not find user")
                             return
                         }
-                        completion(user.fullName)
+                        completion(user)
                     case .failure(let error):
                         print("Got failed result with \(error.errorDescription)")
-                        completion("")
                     }
                 case .failure(let error):
                     print("Got failed event with \(error)")
-                    completion("")
                 }
             }
         }
