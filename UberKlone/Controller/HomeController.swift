@@ -14,7 +14,7 @@ private let reuseIdentifier = "LocationCell"
 class HomeController: UIViewController {
     //MARK: - Properties
     private let mapView = MKMapView()
-    private let locationManager = CLLocationManager()
+    private let locationManager = LocationHandler.shared.locationManager
     private let locationInputActivationView = LocationInputActivationView()
     private let locationInputView = LocationInputView()
     private let tableView = UITableView()
@@ -139,20 +139,18 @@ class HomeController: UIViewController {
 
 //MARK: - Location Services
 
-extension HomeController: CLLocationManagerDelegate {
+extension HomeController {
     func enableLocationServices() {
-        locationManager.delegate = self
-        
-        switch locationManager.authorizationStatus {
-        case .notDetermined:
-            locationManager.requestWhenInUseAuthorization()
+        switch locationManager?.authorizationStatus {
+        case .notDetermined, .none:
+            locationManager?.requestWhenInUseAuthorization()
         case .restricted, .denied:
             break
         case .authorizedAlways:
             print("DEBUG: Auth always..")
         case .authorizedWhenInUse:
-            locationManager.startUpdatingLocation()
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+            locationManager?.startUpdatingLocation()
+            locationManager?.desiredAccuracy = kCLLocationAccuracyBest
         @unknown default:
             break
         }

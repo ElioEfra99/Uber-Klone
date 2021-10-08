@@ -12,6 +12,8 @@ class SignUpController: UIViewController {
     
     //MARK: - Properties
     
+    var location = LocationHandler.shared.locationManager.location
+    
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "UBER"
@@ -195,17 +197,41 @@ class SignUpController: UIViewController {
                 switch result {
                 case .success(let user):
                     print("DEBUG: Successfully created the user: \(user)")
-                    DispatchQueue.main.async {
-                        guard let controller = UIApplication.shared.keyWindow?.rootViewController as? HomeController else { return }
-                        controller.configureUI()
-                        self.dismiss(animated: true, completion: nil)
+                    if user.accountType == 1 {
+                        guard let location = self.location else { return }
+                        let driver = DriverLocations(id: user.id, latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+                        
+                        self.create(driverLocation: driver)
+                        return
                     }
+                    
+                    self.showHomeController()
+                    
                 case .failure(let graphQLError):
                     // Probably delete recently created user, as creating a table with its data was not possible
                     print("DEBUG: Failed to create graphql \(graphQLError)")
                 }
             case .failure(let apiError):
                 print("DEBUG: Failed to create a user", apiError)
+            }
+        }
+    }
+    
+    func create(driverLocation: DriverLocations) {
+        Amplify.API.mutate(request: .create(driverLocation)) { event in
+            switch event {
+            case .success(let result):
+                switch result {
+                case .success(let driverLocation):
+                    print("DEBUG: Successfully created the driver location: \(driverLocation)")
+                    
+                    self.showHomeController()
+                                        
+                case .failure(let graphQLError):
+                    print("DEBUG: Failed to create graphql \(graphQLError)")
+                }
+            case .failure(let apiError):
+                print("DEBUG: Failed to create driver location", apiError)
             }
         }
     }
@@ -232,6 +258,16 @@ class SignUpController: UIViewController {
             case .failure(let error):
                 print("DEBUG: Fetching user attributes failed with error \(error)")
             }
+        }
+    }
+    
+    func showHomeController() {
+        print("nice")
+        DispatchQueue.main.async {
+            guard let controller = UIApplication.shared.keyWindow?.rootViewController as? HomeController else { return }
+            controller.configureUI()
+            controller.fetchUserData()
+            self.dismiss(animated: true, completion: nil)
         }
     }
 }

@@ -80,8 +80,7 @@ class Service {
                 }
                 completion(id!.value)
             case .failure(let error):
-                print("Fetching user attributes failed with error \(error)")
-                completion("")
+                print("DEBUG: Fetching user ID failed with error \(error)")
             }
         }
     }

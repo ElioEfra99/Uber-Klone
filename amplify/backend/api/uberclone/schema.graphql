@@ -4,3 +4,9 @@ type User @model {
   email: AWSEmail!
   fullName: String!
 }
+
+type DriverLocations @model {
+  id: ID!
+  latitude: Float!
+  longitude: Float!
+}
