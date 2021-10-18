@@ -2,7 +2,7 @@
 import Amplify
 import Foundation
 
-extension DriverLocations {
+extension DriverLocation {
   // MARK: - CodingKeys 
    public enum CodingKeys: String, ModelKey {
     case id
@@ -16,16 +16,16 @@ extension DriverLocations {
   //  MARK: - ModelSchema 
   
   public static let schema = defineSchema { model in
-    let driverLocations = DriverLocations.keys
+    let driverLocation = DriverLocation.keys
     
     model.pluralName = "DriverLocations"
     
     model.fields(
       .id(),
-      .field(driverLocations.latitude, is: .required, ofType: .double),
-      .field(driverLocations.longitude, is: .required, ofType: .double),
-      .field(driverLocations.createdAt, is: .optional, isReadOnly: true, ofType: .dateTime),
-      .field(driverLocations.updatedAt, is: .optional, isReadOnly: true, ofType: .dateTime)
+      .field(driverLocation.latitude, is: .required, ofType: .double),
+      .field(driverLocation.longitude, is: .required, ofType: .double),
+      .field(driverLocation.createdAt, is: .optional, isReadOnly: true, ofType: .dateTime),
+      .field(driverLocation.updatedAt, is: .optional, isReadOnly: true, ofType: .dateTime)
     )
     }
 }

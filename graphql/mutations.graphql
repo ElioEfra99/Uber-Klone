@@ -38,3 +38,39 @@ mutation DeleteUser(
     updatedAt
   }
 }
+mutation CreateDriverLocation(
+  $input: CreateDriverLocationInput!
+  $condition: ModelDriverLocationConditionInput
+) {
+  createDriverLocation(input: $input, condition: $condition) {
+    id
+    latitude
+    longitude
+    createdAt
+    updatedAt
+  }
+}
+mutation UpdateDriverLocation(
+  $input: UpdateDriverLocationInput!
+  $condition: ModelDriverLocationConditionInput
+) {
+  updateDriverLocation(input: $input, condition: $condition) {
+    id
+    latitude
+    longitude
+    createdAt
+    updatedAt
+  }
+}
+mutation DeleteDriverLocation(
+  $input: DeleteDriverLocationInput!
+  $condition: ModelDriverLocationConditionInput
+) {
+  deleteDriverLocation(input: $input, condition: $condition) {
+    id
+    latitude
+    longitude
+    createdAt
+    updatedAt
+  }
+}

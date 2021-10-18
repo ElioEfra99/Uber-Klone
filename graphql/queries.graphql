@@ -26,3 +26,28 @@ query ListUsers(
     nextToken
   }
 }
+query GetDriverLocation($id: ID!) {
+  getDriverLocation(id: $id) {
+    id
+    latitude
+    longitude
+    createdAt
+    updatedAt
+  }
+}
+query ListDriverLocations(
+  $filter: ModelDriverLocationFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listDriverLocations(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      latitude
+      longitude
+      createdAt
+      updatedAt
+    }
+    nextToken
+  }
+}

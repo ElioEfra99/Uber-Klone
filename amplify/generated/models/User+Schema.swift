@@ -9,6 +9,7 @@ extension User {
     case accountType
     case email
     case fullName
+    case location
     case createdAt
     case updatedAt
   }
@@ -26,6 +27,7 @@ extension User {
       .field(user.accountType, is: .required, ofType: .int),
       .field(user.email, is: .required, ofType: .string),
       .field(user.fullName, is: .required, ofType: .string),
+      .belongsTo(user.location, is: .optional, ofType: Location.self, targetName: "userLocationId"),
       .field(user.createdAt, is: .optional, isReadOnly: true, ofType: .dateTime),
       .field(user.updatedAt, is: .optional, isReadOnly: true, ofType: .dateTime)
     )

@@ -8,6 +8,7 @@
 import UIKit
 import Amplify
 import AmplifyPlugins
+import CoreLocation
 
 class Service {
     static let shared = Service()
@@ -85,28 +86,53 @@ class Service {
         }
     }
     
-    func fetchUserData(completion: @escaping (User) -> Void) {
-        fetchUID {
-            Amplify.API.query(request: .get(User.self, byId: $0)) { event in
-                switch event {
-                case .success(let result):
-                    switch result {
-                    case .success(let user):
-                        guard let user = user else {
-                            print("Could not find user")
-                            return
-                        }
-                        completion(user)
-                    case .failure(let error):
-                        print("Got failed result with \(error.errorDescription)")
+    func fetchUserData(with uid: String ,completion: @escaping (User) -> Void) {
+        Amplify.API.query(request: .get(User.self, byId: uid)) { event in
+            switch event {
+            case .success(let result):
+                switch result {
+                case .success(let user):
+                    guard let user = user else {
+                        print("Could not find user")
+                        return
                     }
+                    completion(user)
                 case .failure(let error):
-                    print("Got failed event with \(error)")
+                    print("Got failed result with \(error.errorDescription)")
                 }
+            case .failure(let error):
+                print("Got failed event with \(error)")
             }
         }
     }
     
+    func fetchDrivers(by location: CLLocation, completion: @escaping ([DriverLocation]) -> Void) {
+        
+        Amplify.API.query(request: .paginatedList(DriverLocation.self)) { event in
+            switch event {
+            case .success(let result):
+                switch result {
+                case .success(let drivers):
+                    print("Successfully retrieved list of drivers: \(drivers)")
+                    
+                    let closestDrivers = drivers.filter { driver in
+                        let driverLocation = CLLocation(latitude: driver.latitude, longitude: driver.longitude)
+                        if location.distance(from: driverLocation) < 1500 {
+                            return true
+                        }
+                        return false
+                    }
+                    
+                    completion(closestDrivers)
+                case .failure(let error):
+                    print("Got failed result with \(error.errorDescription)")
+                    completion([DriverLocation]())
+                }
+            case .failure(let error):
+                print("Got failed event with error \(error)")
+            }
+        }
+    }
 
     
     //MARK: - Session

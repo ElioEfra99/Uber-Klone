@@ -3,10 +3,16 @@ type User @model {
   accountType: Int!
   email: AWSEmail!
   fullName: String!
+  location: Location @connection
 }
 
-type DriverLocations @model {
+type DriverLocation @model {
   id: ID!
+  latitude: Float!
+  longitude: Float!
+}
+
+type Location @model {
   latitude: Float!
   longitude: Float!
 }

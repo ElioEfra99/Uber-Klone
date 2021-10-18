@@ -2,7 +2,7 @@
 import Amplify
 import Foundation
 
-public struct DriverLocations: Model {
+public struct Location: Model {
   public let id: String
   public var latitude: Double
   public var longitude: Double

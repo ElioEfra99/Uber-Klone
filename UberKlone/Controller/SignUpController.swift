@@ -199,7 +199,7 @@ class SignUpController: UIViewController {
                     print("DEBUG: Successfully created the user: \(user)")
                     if user.accountType == 1 {
                         guard let location = self.location else { return }
-                        let driver = DriverLocations(id: user.id, latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+                        let driver = DriverLocation(id: user.id, latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
                         
                         self.create(driverLocation: driver)
                         return
@@ -217,7 +217,7 @@ class SignUpController: UIViewController {
         }
     }
     
-    func create(driverLocation: DriverLocations) {
+    func create(driverLocation: DriverLocation) {
         Amplify.API.mutate(request: .create(driverLocation)) { event in
             switch event {
             case .success(let result):
@@ -262,7 +262,6 @@ class SignUpController: UIViewController {
     }
     
     func showHomeController() {
-        print("nice")
         DispatchQueue.main.async {
             guard let controller = UIApplication.shared.keyWindow?.rootViewController as? HomeController else { return }
             controller.configureUI()

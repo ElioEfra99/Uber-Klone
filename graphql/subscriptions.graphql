@@ -29,3 +29,30 @@ subscription OnDeleteUser {
     updatedAt
   }
 }
+subscription OnCreateDriverLocation {
+  onCreateDriverLocation {
+    id
+    latitude
+    longitude
+    createdAt
+    updatedAt
+  }
+}
+subscription OnUpdateDriverLocation {
+  onUpdateDriverLocation {
+    id
+    latitude
+    longitude
+    createdAt
+    updatedAt
+  }
+}
+subscription OnDeleteDriverLocation {
+  onDeleteDriverLocation {
+    id
+    latitude
+    longitude
+    createdAt
+    updatedAt
+  }
+}
