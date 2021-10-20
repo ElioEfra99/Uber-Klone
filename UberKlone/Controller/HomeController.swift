@@ -80,14 +80,13 @@ class HomeController: UIViewController {
             
             if !drivers.isEmpty {
                 Service.shared.fetchUserData(with: drivers.first!.id) { user in
-                    
                     var driver = user
-                    let location = Location(latitude: drivers.first!.latitude, longitude: drivers.first!.longitude)
-                    driver.location = location
-                    print("DEBUG: Driver's location is: \(driver.location!)")
+                    driver.location = Location(latitude: drivers.first!.latitude, longitude: drivers.first!.longitude)
+                    let coordinate = CLLocationCoordinate2D(latitude: driver.location!.latitude, longitude: driver.location!.longitude)
+                    let annotation = DriverAnnotation(uid: driver.id, coordinate: coordinate)
+                    self.mapView.addAnnotation(annotation)
                 }
             }
-            
             
         }
     }

@@ -12,6 +12,8 @@ import CoreLocation
 
 class Service {
     static let shared = Service()
+    var subscription: GraphQLSubscriptionOperation<DriverLocation>?
+    
     private init() {}
     
     //MARK: - Register
@@ -108,6 +110,33 @@ class Service {
     
     func fetchDrivers(by location: CLLocation, completion: @escaping ([DriverLocation]) -> Void) {
         
+        subscription = Amplify.API.subscribe(request: .subscription(of: DriverLocation.self, type: .onUpdate), valueListener: { (subscriptionEvent) in
+                switch subscriptionEvent {
+                case .connection(let subscriptionConnectionState):
+                    print("Subscription connect state is \(subscriptionConnectionState)")
+                    self.queryDrivers(by: location, with: completion)
+                case .data(let result):
+                    switch result {
+                    case .success(_):
+                        print("Driver location updated")
+                        self.queryDrivers(by: location, with: completion)
+                    case .failure(let error):
+                        print("Got failed result with \(error.errorDescription)")
+                    }
+                }
+            }) { result in
+                switch result {
+                case .success:
+                    print("Subscription has been closed successfully")
+                case .failure(let apiError):
+                    print("Subscription has terminated with \(apiError)")
+                }
+            }
+        
+        
+    }
+    
+    func queryDrivers(by location: CLLocation, with completion: @escaping ([DriverLocation]) -> Void) {
         Amplify.API.query(request: .paginatedList(DriverLocation.self)) { event in
             switch event {
             case .success(let result):
@@ -117,7 +146,7 @@ class Service {
                     
                     let closestDrivers = drivers.filter { driver in
                         let driverLocation = CLLocation(latitude: driver.latitude, longitude: driver.longitude)
-                        if location.distance(from: driverLocation) < 1500 {
+                        if location.distance(from: driverLocation) <= 1500 {
                             return true
                         }
                         return false
@@ -133,6 +162,7 @@ class Service {
             }
         }
     }
+    
 
     
     //MARK: - Session
