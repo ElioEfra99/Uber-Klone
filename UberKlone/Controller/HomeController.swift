@@ -10,6 +10,7 @@ import Amplify
 import MapKit
 
 private let reuseIdentifier = "LocationCell"
+private let driverReuseIdentifier = "DriverAnno"
 
 class HomeController: UIViewController {
     //MARK: - Properties
@@ -119,6 +120,7 @@ class HomeController: UIViewController {
         
         mapView.showsUserLocation = true
         mapView.userTrackingMode = .follow
+        mapView.delegate = self
     }
     
     func configureLocationInputView() {
@@ -157,6 +159,19 @@ class HomeController: UIViewController {
         }
     }
     
+}
+
+//MARK: - MKMapView Delegate Methods
+
+extension HomeController: MKMapViewDelegate {
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        if let driverAnnotation = annotation as? DriverAnnotation {
+            let view = MKAnnotationView(annotation: driverAnnotation, reuseIdentifier: driverReuseIdentifier)
+            view.image = #imageLiteral(resourceName: "chevron-sign-to-right")
+            return view
+        }
+        return nil
+    }
 }
 
 //MARK: - Location Services
